@@ -46,8 +46,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Move CORS before SessionMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -173,11 +173,15 @@ else:
 
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False  # Explicitly set to False for security
 
 CORS_ALLOW_HEADERS = [
     "accept",
+    "accept-encoding",
     "authorization",
     "content-type",
+    "dnt",
+    "origin",
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
@@ -191,6 +195,15 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
+# Expose headers that the frontend might need
+CORS_EXPOSE_HEADERS = [
+    "content-type",
+    "x-csrf-token",
+]
+
+# Allow preflight requests to be cached for 1 hour
+CORS_PREFLIGHT_MAX_AGE = 3600
 
 # Spectacular (OpenAPI) Settings
 SPECTACULAR_SETTINGS = {
