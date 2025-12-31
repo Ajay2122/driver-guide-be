@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,13 +161,35 @@ CORS_ALLOW_METHODS = [
     "PUT",
 ]
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "https://sharilyn-unblinding-beau.ngrok-free.dev",
-#     "https://*.ngrok-free.dev",
-# ]
+# CORS / CSRF origins
+# Allow overrides via environment variable `CORS_ALLOWED_ORIGINS` (comma-separated).
+# If an origin lacks a scheme, default to https:// (common for deployed frontends).
+def _normalize_origin(origin: str) -> str:
+    origin = origin.strip()
+    if not origin:
+        return ''
+    if origin.startswith('http://') or origin.startswith('https://'):
+        return origin
+    return f"https://{origin}"
 
+_default_cors = ["http://localhost:3000", "http://127.0.0.1:3000"]
+env_cors = os.environ.get('CORS_ALLOWED_ORIGINS')
+if env_cors:
+    CORS_ALLOWED_ORIGINS = [
+        _normalize_origin(o) for o in env_cors.split(',') if o.strip()
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = _default_cors
+
+# CSRF trusted origins — can be the same as CORS origins or overridden with CSRF_TRUSTED_ORIGINS env
+env_csrf = os.environ.get('CSRF_TRUSTED_ORIGINS')
+if env_csrf:
+    CSRF_TRUSTED_ORIGINS = [
+        _normalize_origin(o) for o in env_csrf.split(',') if o.strip()
+    ]
+else:
+    # include localhost for development plus any CORS origins that look like full URLs
+    CSRF_TRUSTED_ORIGINS = [o for o in CORS_ALLOWED_ORIGINS if o.startswith('http')]
 CORS_ALLOW_CREDENTIALS = True
 
 # Spectacular (OpenAPI) Settings
