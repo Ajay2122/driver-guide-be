@@ -398,6 +398,62 @@ GET /api/v1/logs/{logId}/route/
 - `id` - UUID (Primary Key)
 - `name` - String
 - `licenseNumber` - String (Unique)
+
+## Docker / Render deployment
+
+This project includes a Docker setup suitable for running locally and deploying to Render (or any container-based host).
+
+Files added:
+- `Dockerfile` - builds the app image, installs deps, runs migrations, collects static files, and starts Gunicorn.
+- `entrypoint.sh` - runs migrations, collects static, then execs Gunicorn.
+- `.dockerignore` - keeps the image small by ignoring local files.
+- `docker-compose.yml` - quick local developer compose file (binds port 8000, mounts code and sqlite file).
+
+Local Docker (build & run):
+
+1) Build the image:
+
+```powershell
+docker build -t driver-guide-be .
+```
+
+2) Run the container (replace SECRET_KEY):
+
+```powershell
+docker run --rm -p 8000:8000 -e SECRET_KEY="your-secret-key" driver-guide-be
+```
+
+The app will be available at http://localhost:8000
+
+Using docker-compose (recommended for local development):
+
+```powershell
+docker-compose up --build
+```
+
+This will mount the project into the container so code changes are visible without rebuilding. The sqlite file `db.sqlite3` from the host is mounted into the container for persistence in this simple setup.
+
+Notes for Render deployment:
+- In Render, create a new Web Service and connect your repository.
+- Choose "Docker" as the environment so Render will build using the repository `Dockerfile`.
+- Set environment variables (at minimum):
+  - `SECRET_KEY` (generate a secure value)
+  - `DEBUG=false`
+  - `ALLOWED_HOSTS` (optional, Render will provide a host)
+- If you expect production traffic, use a managed PostgreSQL database and update `DATABASES` in `buslogs/settings.py` to use the database URL (or use `dj-database-url`).
+
+Why these files were added
+- `gunicorn` was added to `requirements.txt` so the container can run Gunicorn as the WSGI server.
+- `STATIC_ROOT` was added to `buslogs/settings.py` so `collectstatic` can collect into `/app/staticfiles` inside the container.
+
+Security & production notes
+- Do not commit production `SECRET_KEY` to the repo. Use environment variables in Render.
+- Using SQLite in production is not recommended; switch to PostgreSQL for multi-instance or reliable persistence.
+
+If you'd like, I can also:
+- Add a small `Procfile` for platforms that expect one.
+- Add support for `dj-database-url` and reading `DATABASE_URL` from env for 12-factor style config.
+
 - `homeTerminal` - String
 - `mainOfficeAddress` - String
 - `createdAt` - DateTime
