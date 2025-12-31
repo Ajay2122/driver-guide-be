@@ -12,7 +12,4 @@ dist/
 *.log
 node_modules/
 .env
-*.egg-info
-Dockerfile
-docker-compose.yml
-entrypoint.sh
+.egg-info
