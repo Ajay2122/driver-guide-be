@@ -151,9 +151,9 @@ def _normalize_origin(origin: str) -> str:
 
 # Default CORS origins for development
 _default_cors = [
-    "https://driver-guide-fe.vercel.app"
+    "https://driver-guide-fe.vercel.app",
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3000"
 ]
 
 # Allow overrides via environment variable `CORS_ALLOWED_ORIGINS` (comma-separated)
