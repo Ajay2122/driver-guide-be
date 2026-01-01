@@ -11,8 +11,13 @@ from .views.gps import (
     calculate_route_distance_view,
     get_log_route_view
 )
+class OptionalSlashRouter(DefaultRouter):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.trailing_slash = '/?'  # Makes trailing slash optional
 
-router = DefaultRouter()
+router = OptionalSlashRouter()
+# router = DefaultRouter()
 router.register(r'drivers', DriverViewSet, basename='drivers')
 router.register(r'logs', DailyLogViewSet, basename='dailylog')
 
