@@ -37,16 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'django_filters',
-    'corsheaders',
     'drf_spectacular',
     'logs',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # Move CORS before SessionMiddleware
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -133,6 +133,10 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'EXCEPTION_HANDLER': 'logs.exceptions.custom_exception_handler',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
 }
 
 # CORS / CSRF Configuration
@@ -147,9 +151,9 @@ def _normalize_origin(origin: str) -> str:
 
 # Default CORS origins for development
 _default_cors = [
+    "https://driver-guide-fe.vercel.app"
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://driver-guide-fe.vercel.app"
 ]
 
 # Allow overrides via environment variable `CORS_ALLOWED_ORIGINS` (comma-separated)
@@ -173,7 +177,7 @@ else:
 
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False  # Explicitly set to False for security
+CORS_ALLOW_ALL_ORIGINS = True  # Explicitly set to False for security
 
 CORS_ALLOW_HEADERS = [
     "accept",
