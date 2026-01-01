@@ -45,7 +45,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Move CORS before SessionMiddleware
+    'buslogs.cors_middleware.CustomCorsMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',  # Move CORS before SessionMiddleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
